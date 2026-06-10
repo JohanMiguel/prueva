@@ -1,0 +1,7 @@
+[
+  {"id": 13, "member": "", "action": "check-in", "result": "denied", "timestamp": "2026-06-01T11:00:00Z"},
+  {"id": 14, "member": "Luis Soto", "action": "check-in", "result": "DENIED", "timestamp": "2026-06-01T11:01:00Z"},
+  {"id": 15, "member": "Luis Soto", "action": "check-in", "result": "denied", "timestamp": "not-a-date"},
+  {"id": 16, "member": "Sara Díaz", "action": "check-in", "result": "granted", "timestamp": "2026-06-01T11:05:00Z"},
+  {"id": 17, "member": "Carlos Gómez", "action": "check-in", "result": "denied", "timestamp": "2026-06-01T10:02:00Z"}
+]

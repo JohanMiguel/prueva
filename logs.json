@@ -1,0 +1,14 @@
+[
+	{"id":1,"member":"Juan Pérez","action":"check-in","result":"denied","timestamp":"2026-06-01T08:01:00Z"},
+	{"id":2,"member":"María López","action":"check-in","result":"granted","timestamp":"2026-06-01T08:05:00Z"},
+	{"id":3,"member":"Juan Pérez","action":"check-in","result":"denied","timestamp":"2026-06-01T08:02:00Z"},
+	{"id":4,"member":"Carlos Gómez","action":"check-in","result":"granted","timestamp":"2026-06-01T08:10:00Z"},
+	{"id":5,"member":"María López","action":"check-in","result":"granted","timestamp":"2026-06-01T09:00:00Z"},
+	{"id":6,"member":"Juan Pérez","action":"check-in","result":"denied","timestamp":"2026-06-01T09:02:00Z"},
+	{"id":7,"member":"Ana Martínez","action":"check-in","result":"denied","timestamp":"2026-06-01T09:05:00Z"},
+	{"id":8,"member":"Juan Pérez","action":"check-in","result":"denied","timestamp":"2026-06-01T09:03:00Z"},
+	{"id":9,"member":"Ana Martínez","action":"check-in","result":"granted","timestamp":"2026-06-01T09:30:00Z"},
+	{"id":10,"member":"Carlos Gómez","action":"check-in","result":"denied","timestamp":"2026-06-01T10:00:00Z"},
+	{"id":11,"member":"Carlos Gómez","action":"check-in","result":"denied","timestamp":"2026-06-01T10:01:00Z"},
+	{"id":12,"member":"Carlos Gómez","action":"check-in","result":"denied","timestamp":"2026-06-01T10:02:00Z"}
+]
