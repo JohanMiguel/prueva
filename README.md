@@ -1,303 +1,177 @@
-# Kiosco Logs - Node.js Backend
+# Decisiones de Implementación
 
-Backend especializado en Node.js para análisis de logs de acceso a kioscos. Implementado con Express.js, CORS, logging de peticiones y validación robusta de datos.
+## Vía Elegida
 
-## Requisitos Técnicos Implementados
+Utilize la **Vía B** para apoyar tareas de revisión, análisis y validación de soluciones.
 
-✅ **Servidor Express en puerto 3000**  
-✅ **Lógica (analyzer) separada del servidor**  
-✅ **Rutas no definidas responden 404 con JSON claro**  
-✅ **CORS habilitado para cualquier origen**  
-✅ **Logger de peticiones con Morgan**  
-✅ **Manejo de errores básico sin stack traces crudos**  
-✅ **Validación de datos con normalización**
-
-## Funciones Implementadas
-
-### 1. `getMembersWithMostDenials(logs, topNque)`
-
-Cuenta los accesos denegados por miembro y devuelve los top N ordenados de mayor a menor.
-
-**Parámetros:**
-- `logs`: Array de entradas de log
-- `topNque`: Número máximo de miembros a devolver (default: 5)
-
-**Retorna:** `Array<{member: string, denials: number}>`
-
-**Ejemplo con logs.json:**
-```bash
-curl "http://localhost:3000/members/most-denials?topN=3"
-```
-
-**Respuesta Esperada:**
-```json
-{
-  "topNque": 3,
-  "members": [
-    { "member": "Juan Pérez", "denials": 4 },
-    { "member": "Carlos Gómez", "denials": 3 },
-    { "member": "Ana Martínez", "denials": 1 }
-  ]
-}
-```
+La implementación, validación de resultados, corrección de errores y decisiones técnicas fueron revisadas manualmente antes de incorporarlo al proyecto.
 
 ---
 
-### 2. `getHourlyBreakdown(logs)`
+## Ambigüedades Detectadas
 
-Devuelve un objeto donde las llaves son las horas del día (0–23) y los valores son la cantidad total de accesos en esa hora, sin importar el día ni el resultado. **Solo incluye las horas que tienen al menos un acceso.**
+### Interpretación de `maxAttempts`
 
-**Parámetros:**
-- `logs`: Array de entradas de log
+El enunciado indica:
 
-**Retorna:** `Object<hour: string, count: number>`
+> "más de maxAttempts intentos dentro de windowMinutes"
 
-**Ejemplo:**
-```bash
-curl "http://localhost:3000/hourly-breakdown"
-```
+Al revisar los ejemplos de la prueba, se observó que un usuario es marcado como sospechoso incluso cuando alcanza exactamente la cantidad de intentos indicada en `maxAttempts`.
 
-**Respuesta esperada (con logs.json limpio):**
-```json
-{
-  "breakdown": {
-    "8": 4,
-    "9": 5,
-    "10": 3
-  }
-}
-```
-
-**Conteo manual verificado:**
-- Hora 8: IDs 1, 2, 3, 4 = 4 accesos
-- Hora 9: IDs 5, 6, 7, 8, 9 = 5 accesos
-- Hora 10: IDs 10, 11, 12 = 3 accesos
-
----
-
-### 3. `getSuspiciousActivity(logs, maxAttempts, windowMinutes)`
-
-Detecta miembros que tuvieron `maxAttempts` o más intentos en un periodo de `windowMinutes` minutos. Devuelve detalles completos de cada incidente (miembro, cantidad de intentos, hora de inicio y fin).
-
-**Parámetros:**
-- `logs`: Array de entradas de log
-- `maxAttempts`: Número máximo de intentos (default: 5)
-- `windowMinutes`: Ventana de tiempo en minutos (default: 5)
-
-**Retorna:** `Array<{member: string, attempts: number, startTime: string, endTime: string}>`
-
-**Ejemplo:**
-```bash
-curl "http://localhost:3000/suspicious?maxAttempts=3&windowMinutes=2"
-```
-
-**Respuesta:**
-```json
-{
-  "maxAttempts": 3,
-  "windowMinutes": 2,
-  "incidents": [
-    {
-      "member": "Carlos Gómez",
-      "attempts": 3,
-      "startTime": "2026-06-01T10:00:00Z",
-      "endTime": "2026-06-01T10:02:00Z"
-    }
-  ]
-}
-```
-
----
-
-## Estructura del Proyecto
-
-```
-kiosco-logs/
-├── package.json          # Dependencias y scripts
-├── logs.json             # Datos limpios para análisis
-├── logs_dirty.json       # Datos sucios (ejemplos de validación)
-├── queries.sql           # Consultas SQL de referencia
-├── bugs.md               # Reporte de bugs
-├── README.md             # Este archivo
-└── src/
-    ├── analyzer.js       # Funciones de análisis (lógica pura)
-    └── server.js         # Servidor Express con rutas
-```
-
-## Instalación y Setup
-
-### 1. Clonar o descargar el proyecto
-
-```bash
-cd kiosco-logs
-```
-
-### 2. Instalar dependencias
-
-```bash
-npm install
-```
-
-Las dependencias incluyen:
-- `express`: ^5.2.1 - Framework web
-- `cors`: ^2.8.5 - Habilitar CORS
-- `morgan`: ^1.10.0 - Logger de peticiones HTTP
-
-### 3. Iniciar el servidor
-
-```bash
-npm start
-```
-
-**Salida esperada:**
-```
-kiosco-logs server listening on port 3000
-```
-
-### 4. Pruebas rápidas
-
-Con el servidor en ejecución, prueba las rutas:
-
-#### Miembros con más denegaciones (top 3):
-```bash
-curl "http://localhost:3000/members/most-denials?topN=3"
-```
-
-#### Desglose por hora:
-```bash
-curl "http://localhost:3000/hourly-breakdown"
-```
-
-#### Actividad sospechosa:
-```bash
-curl "http://localhost:3000/suspicious?maxAttempts=3&windowMinutes=2"
-```
-
-#### Ruta no definida (404):
-```bash
-curl "http://localhost:3000/invalid-route"
-```
-
-**Respuesta:**
-```json
-{ "error": "Not Found", "path": "/invalid-route" }
-```
-
----
-
-## Características Técnicas
-
-### Validación de Datos
-
-- Normalización de campos (`trim()`, `toLowerCase()`)
-- Filtrado de entries inválidas (miembros vacíos, timestamps no parseables)
-- Manejo de valores case-insensitive (`"DENIED"`, `"denied"`, etc.)
-- Protección contra valores `null`, `undefined` y tipos incorrectos
-
-### Manejo de Errores
-
-- Try-catch en cada ruta para evitar crashes
-- Respuestas JSON consistentes con status HTTP apropiados
-- Logs en consola para debugging
-- Sin exposición de stack traces en cliente
-
-### Logging
-
-Morgan registra cada petición HTTP:
-```
-::ffff:127.0.0.1 - - [10/Jun/2026:22:46:19 +0000] "GET /members/most-denials?topN=3 HTTP/1.1" 200 ...
-```
-
----
-
-## Datos de Ejemplo (logs.json)
-
-El archivo incluye 12 entradas de ejemplo:
-
-```json
-[
-  {"id":1,"member":"Juan Pérez","action":"check-in","result":"denied","timestamp":"2026-06-01T08:01:00Z"},
-  {"id":2,"member":"María López","action":"check-in","result":"granted","timestamp":"2026-06-01T08:05:00Z"},
-  ...
-]
-```
-
-**Estadísticas:**
-- **Juan Pérez**: 4 denegaciones (08:01, 08:02, 09:02, 09:03)
-- **Carlos Gómez**: 3 denegaciones (10:00, 10:01, 10:02)
-- **Ana Martínez**: 1 denegación (09:05)
-
----
-
-## Desarrollo
-
-### Ejecutar pruebas manuales
-
-Usa Thunder Client, Postman o cURL para probar las rutas.
-
-### Agregar nuevas funciones
-
-1. Implementa la lógica en `src/analyzer.js`
-2. Exporta desde `module.exports`
-3. Importa en `src/server.js`
-4. Crea la ruta GET correspondiente
-5. Envuelve en try-catch para manejo de errores
-
-Ejemplo:
+Debido a esto, se optó por considerar el umbral como inclusivo (`>=`) en lugar de exigir que lo supere (`>`), ya que esta interpretación coincide mejor con los resultados esperados.
 
 ```javascript
-// En analyzer.js
-function myNewAnalysis(logs) {
-  // lógica
-  return results;
-}
-module.exports = { ..., myNewAnalysis };
+attempts >= maxAttempts
+```
 
-// En server.js
-const { myNewAnalysis } = require('./analyzer');
-app.get('/my-endpoint', (req, res) => {
-  try {
-    const logs = loadLogs();
-    const results = myNewAnalysis(logs);
-    res.json({ results });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed', detail: err.message });
-  }
-});
+en lugar de:
+
+```javascript
+attempts > maxAttempts
 ```
 
 ---
 
-## Variables de Entorno
+### Promedio de accesos por hora (SQL)
 
-Puedes configurar el puerto con:
+La descripción puede interpretarse de distintas formas:
 
-```bash
-PORT=8000 npm start
+* Cantidad total de accesos agrupados por hora.
+* Promedio histórico por hora del día.
+* Promedio dentro de una ventana de 24 horas.
+
+Para la solución se asumió una agrupación por hora dentro de las últimas 24 horas.
+
+---
+
+## Política para logs_dirty.json
+
+Durante el procesamiento de datos se aplicaron las siguientes reglas:
+
+### Miembros inválidos
+
+Se ignoran registros donde:
+
+* `member` sea nulo.
+* `member` sea una cadena vacía.
+* `member` contenga únicamente espacios.
+
+### Timestamps inválidos
+
+Se descartan registros cuyo timestamp no pueda convertirse a una fecha válida mediante:
+
+```javascript
+Date.parse(...)
 ```
 
-Por defecto usa `3000`.
+### Resultados inconsistentes
+
+Los valores de resultado se normalizan utilizando:
+
+```javascript
+String(result).toLowerCase()
+```
+
+permitiendo procesar correctamente variantes como:
+
+```text
+DENIED
+Denied
+denied
+```
+
+### Registros incompletos
+
+Cualquier entrada que no contenga la información mínima requerida para el análisis es ignorada.
+
+Esta estrategia evita fallos de ejecución y mantiene consistencia en los resultados.
 
 ---
 
-## Troubleshooting
+## Uso de Ventana Deslizante (Sliding Window)
 
-### Error: "Unexpected end of JSON input"
-- Verifica que `logs.json` sea JSON válido: `node -e "JSON.parse(require('fs').readFileSync('logs.json','utf8'))"`
+La función `getSuspiciousActivity()` utiliza la técnica conocida como Sliding Window.
 
-### Puerto 3000 ya en uso
-- Cambia el puerto: `PORT=3001 npm start`
+### Motivación
 
-### Rutas devuelven array vacío
-- Verifica que `logs.json` contenga datos
-- Revisa la consola para logs de error
+Permite detectar múltiples intentos realizados dentro de una ventana temporal sin necesidad de comparar cada evento contra todos los demás.
+
+### Funcionamiento
+
+Para cada miembro:
+
+1. Se ordenan cronológicamente los eventos.
+2. Se mantienen dos índices:
+
+   * left
+   * right
+3. La ventana se expande hacia adelante.
+4. Cuando la diferencia temporal supera el límite configurado, el índice izquierdo avanza.
+
+### Complejidad
+
+* Ordenamiento: O(n log n)
+* Recorrido de ventana: O(n)
+
+Esto resulta considerablemente más eficiente que una solución O(n²).
 
 ---
 
-## Licencia
+## Prompt Utilizado con IA
 
-ISC
+Ejemplo de prompt utilizado durante el desarrollo:
+
+> Actúa como un Senior Backend Engineer especializado en Node.js y Express. Analiza el código, identifica problemas de diseño, valida complejidad temporal, detecta errores de lógica y propone mejoras alineadas con buenas prácticas de ingeniería de software.
+
+Las sugerencias obtenidas fueron revisadas y adaptadas antes de su incorporación.
 
 ---
 
-**Última actualización:** 2026-06-10
+## Mejoras Futuras
+
+Si se dispusiera de más tiempo, se implementarían las siguientes mejoras:
+
+### Pruebas automatizadas
+
+* Unit tests para analyzer.js.
+* Casos borde para logs inválidos.
+* Verificación de pureza de funciones.
+
+### Procesamiento de grandes volúmenes
+
+Para millones de registros:
+
+* Lectura mediante streams.
+* Procesamiento incremental.
+* Agregaciones parciales en memoria.
+
+### Configuración externa
+
+Mover parámetros como:
+
+* maxAttempts
+* windowMinutes
+* topN
+
+a variables de entorno o archivos de configuración.
+
+### Observabilidad
+
+Agregar:
+
+* métricas
+* trazabilidad
+* monitoreo
+
+para facilitar la operación en producción.
+
+### Optimización de carga
+
+Actualmente el archivo se lee en cada petición.
+
+Una posible mejora sería:
+
+* cachear los datos en memoria.
+* invalidar la caché cuando cambie el archivo.
+
+Esto reduciría operaciones de I/O y mejoraría el rendimiento.

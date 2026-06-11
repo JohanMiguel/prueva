@@ -104,33 +104,7 @@ function getSuspiciousActivity(logs, maxAttempts = 5, windowMinutes = 5) {
 	return incidents;
 }
 
-function detectRapidDenials(logs, threshold = 3, windowMinutes = 5) {
-  if (!Array.isArray(logs)) return [];
 
-  threshold = Math.max(1, Number(threshold) || 1);
-  windowMinutes = Math.max(0, Number(windowMinutes) || 0);
-
-  // Filtrar denials válidos, parsear timestamp a ms y no mutar el array original
-  const denials = logs
-    .filter(l => l && typeof l.member === 'string' && (String(l.result) || '').trim().toLowerCase() === 'denied' && l.timestamp)
-    .map(l => ({ ...l, ts: Date.parse(l.timestamp) }))
-    .filter(l => !Number.isNaN(l.ts))
-    .sort((a, b) => a.ts - b.ts);
-
-  const flagged = new Set();
-  const windowMs = windowMinutes * 60 * 1000;
-
-  for (let i = 0; i <= denials.length - threshold; i++) {
-    const start = denials[i].ts;
-    const end = denials[i + threshold - 1].ts;
-    const diffMinutes = (end - start) / (1000 * 60);
-    if (diffMinutes <= windowMinutes) {
-      flagged.add(denials[i].member.trim());
-    }
-  }
-
-  return Array.from(flagged);
-}
 module.exports = {
 	getMembersWithMostDenials,
 	getHourlyBreakdown,
