@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
 const {
@@ -11,7 +10,6 @@ const {
 
 const app = express();
 app.use(cors());
-app.use(morgan('combined'));
 app.use(express.json());
 
 const LOGS_PATH = path.resolve(__dirname, '..', 'logs.json');
@@ -70,6 +68,28 @@ app.get('/suspicious', (req, res) => {
   } catch (err) {
     console.error('Failed to load logs in /suspicious:', err && err.message);
     res.status(500).json({ error: 'Failed to load logs', detail: err.message });
+  }
+});
+
+app.get('/api/stats', (req, res) => {
+  try {
+    const logs = loadLogs();
+
+    const topDenials = getMembersWithMostDenials(logs, 3);
+    const hourlyBreakdown = getHourlyBreakdown(logs);
+    const suspiciousActivity = getSuspiciousActivity(logs, 3, 5);
+
+    res.json({
+      topDenials,
+      hourlyBreakdown,
+      suspiciousActivity,
+    });
+  } catch (err) {
+    console.error('Failed to load logs in /api/stats:', err && err.message);
+    res.status(500).json({
+      error: 'Failed to load logs',
+      detail: err.message,
+    });
   }
 });
 
