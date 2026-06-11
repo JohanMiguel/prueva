@@ -128,12 +128,94 @@ Utilizar un Set para.
 ---
 
 ## Función Corregida
+```function detectRapidDenials(
+  logs,
+  threshold = 3,
+  windowMinutes = 5
+) {
+  if (!Array.isArray(logs)) {
+    return [];
+  }
 
-(Colocar aquí la versión corregida final)
+  const byMember = {};
+
+  for (const log of logs) {
+    if (
+      !log ||
+      typeof log.member !== "string"
+    ) {
+      continue;
+    }
+
+    const member = log.member.trim();
+
+    if (!member) {
+      continue;
+    }
+
+    const result = String(
+      log.result || ""
+    ).toLowerCase();
+
+    if (result !== "denied") {
+      continue;
+    }
+
+    const timestamp = Date.parse(
+      log.timestamp
+    );
+
+    if (Number.isNaN(timestamp)) {
+      continue;
+    }
+
+    if (!byMember[member]) {
+      byMember[member] = [];
+    }
+
+    byMember[member].push(timestamp);
+  }
+
+  const flagged = new Set();
+  const windowMs =
+    windowMinutes * 60 * 1000;
+
+  for (const [member, timestamps] of Object.entries(byMember)) {
+
+    timestamps.sort((a, b) => a - b);
+
+    let left = 0;
+
+    for (
+      let right = 0;
+      right < timestamps.length;
+      right++
+    ) {
+      while (
+        timestamps[right] -
+          timestamps[left] >
+        windowMs
+      ) {
+        left++;
+      }
+
+      const attempts =
+        right - left + 1;
+
+      if (attempts >= threshold) {
+        flagged.add(member);
+        break;
+      }
+    }
+  }
+
+  return [...flagged];
+}
+```
 
 ## Conclusión
 
-Se identificaron cuatro errores:
+Cuatro errores:
 
 1. Mutación del arreglo original.
 2. Error en el cálculo de tiempo.

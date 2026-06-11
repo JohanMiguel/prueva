@@ -2,7 +2,7 @@
 
 ## Vía Elegida
 
-Utilize la **Vía B** para apoyar tareas de revisión, análisis y validación de soluciones.
+Utilize la **Via B** para apoyar tareas de revisión, análisis y validación de soluciones.
 
 La implementación, validación de resultados, corrección de errores y decisiones técnicas fueron revisadas manualmente antes de incorporarlo al proyecto.
 
@@ -32,7 +32,7 @@ attempts > maxAttempts
 
 ---
 
-### Promedio de accesos por hora (SQL)
+### Promedio de accesos por hora  
 
 La descripción puede interpretarse de distintas formas:
 
@@ -58,7 +58,7 @@ Se ignoran registros donde:
 
 ### Timestamps inválidos
 
-Se descartan registros cuyo timestamp no pueda convertirse a una fecha válida mediante:
+Se descartan registros que timestamp no pueda convertirse a una fecha válida mediante:
 
 ```javascript
 Date.parse(...)
@@ -80,15 +80,7 @@ Denied
 denied
 ```
 
-### Registros incompletos
-
-Cualquier entrada que no contenga la información mínima requerida para el análisis es ignorada.
-
-Esta estrategia evita fallos de ejecución y mantiene consistencia en los resultados.
-
----
-
-## Uso de Ventana Deslizante (Sliding Window)
+## Uso de Ventana Deslizante Sliding Window
 
 La función `getSuspiciousActivity()` utiliza la técnica conocida como Sliding Window.
 
@@ -117,15 +109,34 @@ Esto resulta considerablemente más eficiente que una solución O(n²).
 
 ---
 
-## Prompt Utilizado con IA
+## Via B, uso de IA
 
-Ejemplo de prompt utilizado durante el desarrollo:
+Se utilizo IA como herramienta de apoyo para revisar y validar algunos aspectos técnicos del proyecto.
 
-> Actúa como un Senior Backend Engineer especializado en Node.js y Express. Analiza el código, identifica problemas de diseño, valida complejidad temporal, detecta errores de lógica y propone mejoras alineadas con buenas prácticas de ingeniería de software.
+Uno de los casos donde más aportó fue durante el análisis de la función `detectRapidDenials()` incluida en la sección de depuración (`bugs.md`).
 
-Las sugerencias obtenidas fueron revisadas y adaptadas antes de su incorporación.
+Inicialmente realicé una revisión manual de la función para comprender su comportamiento, identificar posibles errores y entender la lógica utilizada. Posteriormente utilicé IA para contrastar mi análisis, validar hipótesis y explorar posibles mejoras en la implementación.
 
----
+### Prompt utilizado
+
+> Actúa como un Senior Backend Engineer especializado en Node.js y algoritmos. Analiza la siguiente función e identifica errores de lógica, problemas de diseño, efectos secundarios, complejidad temporal y posibles mejoras. Explica el impacto de cada problema y propone una versión corregida justificando los cambios realizados.
+
+### Aportes obtenidos
+
+La revisión asistida permitió confirmar y profundizar en varios aspectos detectados durante el análisis:
+
+- Mutación accidental del arreglo original mediante el uso de `sort()`.
+- Error en el cálculo de diferencia de tiempo en minutos.
+- Riesgo de mezclar eventos pertenecientes a distintos miembros dentro de una misma ventana temporal.
+- Posibilidad de devolver miembros duplicados.
+- Uso de la técnica **Sliding Window** como una alternativa eficiente para resolver el problema.
+
+### Validación de resultados
+
+Todas las observaciones obtenidas mediante IA fueron revisadas y comprendidas antes de ser incorporadas al proyecto.
+
+La IA se utilizó como herramienta de apoyo para el análisis y validación de ideas, mientras que las decisiones de implementación, adaptación al contexto de la prueba y revisión final fueron realizadas manualmente.
+
 
 ## Mejoras Futuras
 
@@ -155,7 +166,7 @@ Mover parámetros como:
 
 a variables de entorno o archivos de configuración.
 
-### Observabilidad
+### Mejoras
 
 Agregar:
 
@@ -174,4 +185,3 @@ Una posible mejora sería:
 * cachear los datos en memoria.
 * invalidar la caché cuando cambie el archivo.
 
-Esto reduciría operaciones de I/O y mejoraría el rendimiento.
